@@ -16,10 +16,7 @@ export function CameraScanner({ open, onClose, onCapture }: { open: boolean; onC
     if (!open) return;
     let stream: MediaStream | null = null;
     let cancelled = false;
-    setError(false);
-    setReady(false);
-    navigator.mediaDevices
-      ?.getUserMedia({ video: { facingMode: "environment", width: { ideal: 1920 } }, audio: false })
+    (navigator.mediaDevices?.getUserMedia({ video: { facingMode: "environment", width: { ideal: 1920 } }, audio: false }) ?? Promise.reject(new Error("no camera")))
       .then((s) => {
         if (cancelled) return s.getTracks().forEach((t) => t.stop());
         stream = s;
@@ -28,10 +25,13 @@ export function CameraScanner({ open, onClose, onCapture }: { open: boolean; onC
           setReady(true);
         }
       })
-      .catch(() => setError(true));
-    if (!navigator.mediaDevices) setError(true);
+      .catch(() => {
+        if (!cancelled) setError(true);
+      });
     return () => {
       cancelled = true;
+      setError(false);
+      setReady(false);
       stream?.getTracks().forEach((t) => t.stop());
     };
   }, [open]);

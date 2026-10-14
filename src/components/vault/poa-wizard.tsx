@@ -25,13 +25,15 @@ export function PoaWizard({ open, onClose }: { open: boolean; onClose: () => voi
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    // Start fresh the next time the wizard opens.
+    return () => {
       setStep(0);
       setCode("");
       setSignature(null);
       setAgreed(false);
       setDone(false);
-    }
+    };
   }, [open]);
 
   const canNext = step === 0 ? poa.topics.length > 0 && poa.capabilities.length > 0 : step === 1 ? code.length === 6 : !!signature && agreed;

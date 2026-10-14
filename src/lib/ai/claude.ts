@@ -2,7 +2,7 @@ import "server-only";
 
 import Anthropic from "@anthropic-ai/sdk";
 import type { z } from "zod";
-import { AI_MODEL, useServerFallback } from "./config";
+import { AI_MODEL, serverFallbackEnabled } from "./config";
 
 export class AiError extends Error {
   constructor(
@@ -55,7 +55,7 @@ export async function callStructured<T>(req: StructuredRequest<T>): Promise<{ da
       system: [{ type: "text", text: req.system, cache_control: { type: "ephemeral" } }],
       messages: [{ role: "user", content: req.content }],
       output_config: { effort: req.effort ?? "medium", format: { type: "json_schema", schema: req.jsonSchema } },
-      ...(useServerFallback() ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const } : {}),
+      ...(serverFallbackEnabled() ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const } : {}),
     });
   } catch (err) {
     if (err instanceof Anthropic.RateLimitError) throw new AiError("ai_rate_limited", "The AI service is busy, try again shortly", 429);

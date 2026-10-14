@@ -24,12 +24,10 @@ export function CategoryBreakdown({ categories }: { categories: CategorySavings[
   const total = sorted.reduce((sum, c) => sum + c.amount, 0);
   const max = Math.max(...sorted.map((c) => c.amount));
 
-  let offset = 0;
-  const segments = sorted.map((c) => {
+  const segments = sorted.map((c, i) => {
     const len = (c.amount / total) * C;
-    const seg = { ...c, len, offset };
-    offset += len;
-    return seg;
+    const offset = sorted.slice(0, i).reduce((sum, p) => sum + (p.amount / total) * C, 0);
+    return { ...c, len, offset };
   });
 
   const focus = active ? sorted.find((c) => c.id === active) : null;
