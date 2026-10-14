@@ -11,6 +11,6 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "לוח בקרה", icon: LayoutDashboard },
   { href: "/inbox", label: "חשבוניות", icon: Inbox },
-  { href: "/claims", label: "תביעות", icon: Scale, soon: true },
+  { href: "/claims", label: "תביעות", icon: Scale },
   { href: "/vault", label: "כספת", icon: Lock, soon: true },
 ];

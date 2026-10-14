@@ -2,7 +2,7 @@
 
 Premium FinTech web app (Hebrew RTL first) that finds overcharges in a household's bills and negotiates or files claims to get the money back.
 
-**Status:** Modules 1 (design system + dashboard) and 2 (smart inbox, upload, camera scan, extracted data view), both on mock data.
+**Status:** Modules 1 (design system + dashboard), 2 (smart inbox) and 3 (claims engine), all on mock data.
 
 ## Run
 
@@ -39,7 +39,7 @@ savvy/
 │  │  ├─ globals.css               # Design system tokens (@theme) + utilities
 │  │  ├─ page.tsx                  # Dashboard (Module 1)
 │  │  ├─ inbox/                    # Module 2 · Smart Inbox and OCR (built, mock extraction)
-│  │  ├─ claims/                   # Module 3 · Negotiation & Claims        (planned)
+│  │  ├─ claims/                   # Module 3 · Negotiation and Claims (built, mock)
 │  │  ├─ vault/                    # Module 4 · Security vault & PoA        (planned)
 │  │  └─ api/                      # Route handlers: AI, webhooks, Gmail/Outlook OAuth (planned)
 │  ├─ components/
@@ -72,3 +72,12 @@ Short, plain Hebrew at eye level: "חסכנו לך ₪120 השבוע", not "זו
 ## Module 2 notes
 
 Extraction is mocked in `src/lib/api/inbox.ts` (`extractDocument`). The real version posts the file to a server route that sends it to the Claude API (vision) and returns line items. Gmail/Outlook "connect" buttons are placeholders for OAuth.
+
+## Module 3 notes (claims engine)
+
+- `src/lib/legal/il.ts`: the library of Israeli consumer-law grounds the engine may cite. Letters only ever cite grounds from this file.
+- `src/lib/claims/letter.ts`: `draftLetter(case)`, currently a deterministic template. Production keeps the signature and has Claude phrase the letter from the case facts and the allowed grounds.
+- `src/hooks/use-claims.ts`: one-tap approval (`useApproveClaim`) sends the letter (mock) and moves the case through the timeline: sent, in progress, credited.
+- Letters are always previewable before approval, and nothing is sent without the user's tap.
+
+**Legal review required:** the grounds and letter text are a product draft, not legal advice. Section numbers are filled in only where well established. An Israeli consumer-law attorney must review the library and templates before any real letter is sent.
