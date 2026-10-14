@@ -6,7 +6,8 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useClaims } from "@/hooks/use-claims";
 import { useDashboard } from "@/hooks/use-dashboard";
-import { formatCurrency } from "@/lib/format";
+import { ACTIVE_MARKET } from "@/config/market";
+import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { ClaimCase } from "@/types/claims";
 import { ApprovalCard } from "./approval-card";
@@ -19,6 +20,17 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: "active", label: "בטיפול" },
   { id: "done", label: "הושלמו" },
 ];
+
+/** Amounts are never converted: each currency is totalled on its own, e.g. "₪540 · $30". */
+function totalParts(claims: ClaimCase[], amount: (c: ClaimCase) => number): string[] {
+  const sums = new Map<string, number>();
+  for (const c of claims) {
+    const cur = c.currency ?? ACTIVE_MARKET.currency;
+    sums.set(cur, (sums.get(cur) ?? 0) + amount(c));
+  }
+  const parts = [...sums].filter(([, v]) => v > 0).sort(([a]) => (a === ACTIVE_MARKET.currency ? -1 : 1));
+  return parts.length ? parts.map(([cur, v]) => formatMoney(v, cur)) : [formatMoney(0)];
+}
 
 const isActive = (c: ClaimCase) => c.status === "sent" || c.status === "in_progress";
 
@@ -33,8 +45,9 @@ export function ClaimsView() {
   const visible = tracked.filter((c) => (filter === "all" ? true : filter === "active" ? isActive(c) : c.status === "resolved"));
   const selected = tracked.find((c) => c.id === selectedId) ?? null;
 
-  const received = tracked.reduce((s, c) => s + (c.actualSaving ?? 0), 0);
-  const expected = tracked.filter(isActive).reduce((s, c) => s + c.estimatedSaving, 0);
+  const received = totalParts(tracked, (c) => c.actualSaving ?? 0);
+  const expected = totalParts(tracked.filter(isActive), (c) => c.estimatedSaving);
+  const awaiting = totalParts(waiting, (c) => c.estimatedSaving);
 
   return (
     <div className="space-y-6 lg:space-y-8">
@@ -48,11 +61,17 @@ export function ClaimsView() {
             {[
               { label: "קיבלת עד עכשיו", value: received, accent: true },
               { label: "בדרך אליך", value: expected },
-              { label: "מחכה לאישור שלך", value: waiting.reduce((s, c) => s + c.estimatedSaving, 0) },
+              { label: "מחכה לאישור שלך", value: awaiting },
             ].map((t) => (
               <GlassCard key={t.label} className="p-5">
                 <p className="text-sm text-ink-muted">{t.label}</p>
-                <p className={cn("num mt-1 text-3xl font-bold", t.accent && "text-money-bright")}>{formatCurrency(t.value)}</p>
+                <p className={cn("mt-1 text-3xl font-bold", t.accent && "text-money-bright")}><span className="flex flex-wrap items-baseline gap-x-3">
+                    {t.value.map((v) => (
+                      <span key={v} dir="ltr" className="num">
+                        {v}
+                      </span>
+                    ))}
+                  </span></p>
               </GlassCard>
             ))}
           </div>

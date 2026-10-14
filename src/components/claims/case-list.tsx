@@ -1,8 +1,8 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency, formatRelative } from "@/lib/format";
-import { TOPIC_LABEL } from "@/lib/legal/il";
+import { formatMoney, formatRelative } from "@/lib/format";
+import { TOPIC_LABEL } from "@/lib/legal";
 import { cn } from "@/lib/utils";
 import type { ClaimCase } from "@/types/claims";
 import { STATUS_META } from "./status";
@@ -31,7 +31,7 @@ export function CaseList({ cases, selectedId, onSelect }: { cases: ClaimCase[]; 
                   <p className="font-semibold">{c.provider}</p>
                   <Badge tone={meta.tone}>{meta.label}</Badge>
                 </div>
-                <p className="mt-0.5 truncate text-sm text-ink-muted">{c.title}</p>
+                <p dir="auto" className="mt-0.5 truncate text-sm text-ink-muted">{c.title}</p>
                 <p className="mt-0.5 text-xs text-ink-faint" suppressHydrationWarning>
                   {TOPIC_LABEL[c.topic]}
                   {last && ` · ${formatRelative(last.at)}`}
@@ -39,7 +39,7 @@ export function CaseList({ cases, selectedId, onSelect }: { cases: ClaimCase[]; 
               </div>
               <div className="text-end">
                 <p className="text-[11px] text-ink-faint">{resolved ? "קיבלת" : "אפשר לחסוך"}</p>
-                <p className={cn("num text-lg font-bold", resolved && "text-money-bright")}>{formatCurrency(c.actualSaving ?? c.estimatedSaving)}</p>
+                <p className={cn("num text-lg font-bold", resolved && "text-money-bright")}>{formatMoney(c.actualSaving ?? c.estimatedSaving, c.currency)}</p>
               </div>
             </button>
           </li>

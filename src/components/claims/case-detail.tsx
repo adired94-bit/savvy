@@ -3,8 +3,8 @@
 import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { GlassCard } from "@/components/ui/glass-card";
-import { formatCurrency } from "@/lib/format";
-import { groundsById, TOPIC_LABEL } from "@/lib/legal/il";
+import { formatMoney } from "@/lib/format";
+import { groundsById, TOPIC_LABEL } from "@/lib/legal";
 import type { ClaimCase } from "@/types/claims";
 import { LetterPreview } from "./letter-preview";
 import { STATUS_META } from "./status";
@@ -27,17 +27,17 @@ export function CaseDetail({ claim, onBack }: { claim: ClaimCase; onBack: () => 
             <p className="text-sm text-ink-muted">
               {claim.provider} · {TOPIC_LABEL[claim.topic]}
             </p>
-            <h2 className="mt-1 text-xl font-bold">{claim.title}</h2>
+            <h2 dir="auto" className="mt-1 text-xl font-bold">{claim.title}</h2>
             <div className="mt-2">
               <Badge tone={meta.tone}>{meta.label}</Badge>
             </div>
           </div>
           <div className="text-end">
             <p className="text-sm text-ink-muted">{resolved ? "קיבלת" : "אפשר לחסוך"}</p>
-            <p className="num text-3xl font-bold text-money-bright">{formatCurrency(claim.actualSaving ?? claim.estimatedSaving)}</p>
+            <p className="num text-3xl font-bold text-money-bright">{formatMoney(claim.actualSaving ?? claim.estimatedSaving, claim.currency)}</p>
           </div>
         </div>
-        <p className="mt-3 text-sm leading-relaxed text-ink-muted">{claim.finding}</p>
+        <p dir="auto" className="mt-3 text-sm leading-relaxed text-ink-muted">{claim.finding}</p>
       </div>
 
       <section>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { TopBar } from "@/components/layout/top-bar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAddDocument, useInbox } from "@/hooks/use-inbox";
+import { ExtractError, extractErrorText } from "@/lib/api/inbox";
 import { CameraScanner } from "./camera-scanner";
 import { DocumentDetail } from "./document-detail";
 import { DocumentList } from "./document-list";
@@ -14,13 +15,19 @@ export function InboxView() {
   const { data, isPending } = useInbox();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [scanning, setScanning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const add = useAddDocument((doc) => setSelectedId(doc.id));
 
   const selected = data?.documents.find((d) => d.id === selectedId) ?? null;
   const toReview = data?.documents.filter((d) => d.status === "needs_review").length ?? 0;
 
+  function onFail(err: unknown) {
+    setError(err instanceof ExtractError ? err.message : extractErrorText("ai_error"));
+  }
+
   function addFiles(files: File[]) {
-    files.forEach((file) => add.mutate({ file, source: "upload", fileName: file.name.replace(/\.[^.]+$/, "") }));
+    setError(null);
+    files.forEach((file) => add.mutate({ file, source: "upload", fileName: file.name.replace(/\.[^.]+$/, "") }, { onError: onFail }));
   }
 
   return (
@@ -29,12 +36,19 @@ export function InboxView() {
 
       <UploadZone onFiles={addFiles} onScan={() => setScanning(true)} />
 
+      {error && (
+        <p role="alert" className="rounded-2xl border border-alert/30 bg-alert/[0.08] px-4 py-3 text-sm text-alert">
+          {error}
+        </p>
+      )}
+
       <CameraScanner
         open={scanning}
         onClose={() => setScanning(false)}
         onCapture={(file) => {
           setScanning(false);
-          add.mutate({ file, source: "camera" });
+          setError(null);
+          add.mutate({ file, source: "camera" }, { onError: onFail });
         }}
       />
 

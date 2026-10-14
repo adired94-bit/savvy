@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
-import { TOPIC_LABEL } from "@/lib/legal/il";
+import { TOPIC_LABEL } from "@/lib/legal";
 import { formatDate } from "@/lib/vault/poa";
 import { useVaultStore } from "@/store/vault-store";
 import { PoaWizard } from "./poa-wizard";

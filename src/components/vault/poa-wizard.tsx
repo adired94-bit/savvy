@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { Switch } from "@/components/ui/switch";
-import { TOPIC_LABEL } from "@/lib/legal/il";
+import { TOPIC_LABEL } from "@/lib/legal";
 import { buildPoaText, CAPABILITIES, NEVER_DO, SCOPE_NOTE } from "@/lib/vault/poa";
 import { cn } from "@/lib/utils";
 import { useVaultStore } from "@/store/vault-store";
