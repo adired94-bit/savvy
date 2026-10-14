@@ -1,6 +1,7 @@
 "use client";
 
 import { TopBar } from "@/components/layout/top-bar";
+import { SwitchSection } from "@/components/switch/switch-section";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboard } from "@/hooks/use-dashboard";
 import { formatCurrency } from "@/lib/format";
@@ -53,6 +54,8 @@ export function Dashboard() {
               {data.anomalies[0] && <AnomalyActionCard anomaly={data.anomalies[0]} />}
             </div>
           </div>
+
+          <SwitchSection limit={2} />
 
           <div className="grid gap-5 xl:grid-cols-12">
             <div className="xl:col-span-7">

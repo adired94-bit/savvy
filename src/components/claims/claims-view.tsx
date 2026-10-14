@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { TopBar } from "@/components/layout/top-bar";
+import { SwitchSection } from "@/components/switch/switch-section";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useClaims } from "@/hooks/use-claims";
@@ -86,6 +87,8 @@ export function ClaimsView() {
               </div>
             </section>
           )}
+
+          <SwitchSection limit={4} />
 
           <section className="grid items-start gap-5 xl:grid-cols-12">
             <div className={cn("xl:col-span-5", selected && "hidden xl:block")}>
