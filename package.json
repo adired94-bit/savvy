@@ -6,9 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test:db": "node supabase/tests/schema.test.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.134.0",
+    "@supabase/supabase-js": "^2.117.3",
     "@tanstack/react-query": "^5.104.2",
     "clsx": "^2.1.1",
     "framer-motion": "^14.2.0",
@@ -16,10 +19,13 @@
     "next": "^16.4.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.7",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.10",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.6.5",
     "@types/react": "^19.3.0",

@@ -4,7 +4,7 @@ import { Ban } from "lucide-react";
 import { GlassCard } from "@/components/ui/glass-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Switch } from "@/components/ui/switch";
-import { TOPIC_LABEL } from "@/lib/legal/il";
+import { TOPIC_LABEL } from "@/lib/legal";
 import { CAPABILITIES, NEVER_DO } from "@/lib/vault/poa";
 import { cn } from "@/lib/utils";
 import { useVaultStore } from "@/store/vault-store";

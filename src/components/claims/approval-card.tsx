@@ -6,8 +6,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { useApproveClaim } from "@/hooks/use-claims";
-import { formatCurrency } from "@/lib/format";
-import { groundsById, TOPIC_LABEL } from "@/lib/legal/il";
+import { formatMoney } from "@/lib/format";
+import { groundsById, TOPIC_LABEL } from "@/lib/legal";
 import { cn } from "@/lib/utils";
 import type { ClaimCase } from "@/types/claims";
 import { LetterPreview } from "./letter-preview";
@@ -25,23 +25,23 @@ export function ApprovalCard({ claim }: { claim: ClaimCase }) {
           <p className="text-xs text-ink-muted">
             {claim.provider} · {TOPIC_LABEL[claim.topic]}
           </p>
-          <h3 className="mt-1 text-lg font-semibold leading-snug">{claim.title}</h3>
+          <h3 dir="auto" className="mt-1 text-lg font-semibold leading-snug">{claim.title}</h3>
         </div>
         <div className="shrink-0 text-end">
           <p className="text-xs text-ink-muted">אפשר לחסוך</p>
-          <p className="num text-3xl font-bold text-money-bright">{formatCurrency(claim.estimatedSaving)}</p>
+          <p className="num text-3xl font-bold text-money-bright">{formatMoney(claim.estimatedSaving, claim.currency)}</p>
         </div>
       </div>
 
-      <p className="mt-3 text-sm leading-relaxed text-ink-muted">{claim.finding}</p>
+      <p dir="auto" className="mt-3 text-sm leading-relaxed text-ink-muted">{claim.finding}</p>
 
       <div className="mt-4 space-y-2">
         {grounds.map((g) => (
           <div key={g.id} className="flex items-start gap-2.5 rounded-xl bg-white/[0.03] px-3 py-2.5 ring-1 ring-inset ring-line">
             <Scale className="mt-0.5 size-4 shrink-0 text-info" />
             <div className="min-w-0 text-sm">
-              <p>{g.plain}</p>
-              <p className="mt-0.5 text-xs text-ink-faint">
+              <p dir="auto">{g.plain}</p>
+              <p dir="auto" className="mt-0.5 text-xs text-ink-faint">
                 {g.law}
                 {g.section ? `, ${g.section}` : ""}
               </p>

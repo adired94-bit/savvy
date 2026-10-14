@@ -2,7 +2,7 @@
 
 Premium FinTech web app (Hebrew RTL first) that finds overcharges in a household's bills and negotiates or files claims to get the money back.
 
-**Status:** Modules 1 (design system + dashboard), 2 (smart inbox), 3 (claims engine) and 4 (vault, power of attorney, settings), all on mock data.
+**Status:** Modules 1 (design system + dashboard), 2 (smart inbox), 3 (claims engine) and 4 (vault, power of attorney, settings), UI on mock data, with a real Claude integration for invoice reading and letter drafting (Module 5) and a Supabase schema ready to apply.
 
 ## Run
 
@@ -10,7 +10,10 @@ Premium FinTech web app (Hebrew RTL first) that finds overcharges in a household
 npm install
 npm run dev     # http://localhost:3000
 npm run build   # production build
+npm run test:db # validates the SQL schema and row level security in an in-memory Postgres
 ```
+
+Copy `.env.example` to `.env.local` and add `ANTHROPIC_API_KEY` to turn on real invoice reading and letters. Without it the app runs in demo mode.
 
 ## Stack
 
@@ -91,3 +94,26 @@ Extraction is mocked in `src/lib/api/inbox.ts` (`extractDocument`). The real ver
 - State lives in `src/store/vault-store.ts` (Zustand, in memory for now).
 - **Not real yet:** the encryption panel is a UI explainer; SMS verification accepts any 6-digit code; the signature stays in memory. Real client-side encryption, identity verification and signature storage arrive with Supabase.
 - **Legal review required:** the power of attorney wording, the validity of a drawn digital signature and the identity checks must be reviewed by an Israeli attorney before launch.
+
+## Module 5 notes (real integration and global support)
+
+**Claude API** (`src/app/api/*`, `src/lib/ai/*`, server only)
+- `POST /api/extract` (multipart `file`, PDF or image up to 10 MB): reads a bill from any company, language and currency and returns structured data (provider, currency, line items, jurisdiction, topic, finding). `POST /api/letters` (JSON): drafts a cancellation or refund letter in Hebrew or English.
+- Model `claude-sonnet-5-5` (override with `ANTHROPIC_MODEL`). The "Claude 3.5 Sonnet" named in the brief is retired. Replies are constrained to a JSON schema (structured outputs) and validated again with zod.
+- **Prompt caching:** the stable instructions (and the legal library for letters) sit in the system block with `cache_control: { type: "ephemeral" }`; the per-request document or case facts come after it, so the breakpoint stays valid. Responses include `usage.cacheWriteTokens` and `usage.cacheReadTokens`.
+- Server-side model fallback is on by default (`ANTHROPIC_SERVER_FALLBACK=off` disables it).
+- Letters may cite only the grounds the server offers for that jurisdiction and topic. The model returns `citedGroundIds`, and the route rejects any id outside the offered set.
+- Both routes rate-limit per IP (in memory, per instance) and treat documents and case text as untrusted data. **Before launch** they need Supabase auth, a shared rate limiter (Redis or similar) and spend alerts.
+- When no key is set, the routes answer 503 and the UI shows clearly marked demo data and the offline template letter.
+
+**Global claims** (`src/lib/legal/`)
+- `il.ts` (Hebrew), `global.ts` for the US, EU and UK (English). `groundsFor(jurisdiction, topic)` picks what the engine may cite.
+- **The FTC "Click-to-Cancel" rule is not cited.** The Eighth Circuit vacated it in July 2025. US cancellation letters rest on ROSCA, state automatic-renewal laws, the FCBA and the FTC Act instead. EU letters use EU 261/2004, the Consumer Rights Directive, UCPD, PSD2 and GDPR erasure; UK letters use UK261, the Consumer Rights Act, the CCR and s.75.
+- Amounts are never converted: every document and claim keeps its own currency (`formatMoney`), and totals are shown per currency.
+- **Legal review required:** every ground and letter needs review by a qualified attorney in each jurisdiction before a real letter is sent.
+
+**Supabase** (`supabase/migrations/0001_init.sql`)
+- Tables: profiles, notification_prefs, connected_accounts, documents, line_items, poa_grants, claims, claim_events, audit_log, plus a private `documents` storage bucket. Row level security (`auth.uid() = user_id`) on everything.
+- The database itself refuses to mark a claim as sent unless an active, unexpired power of attorney covers its topic, jurisdiction and amount. Grants can only be revoked, never edited, and the audit log is append-only (deleted only when the account is erased).
+- Apply it with the Supabase CLI (`supabase db push`) or paste it in the SQL editor. `src/lib/supabase/client.ts` returns `null` until the env vars are set.
+- **Not wired yet:** the screens still read mock data. Binding them to Supabase (auth, saving extracted documents and claims) is the next step and needs a real Supabase project.

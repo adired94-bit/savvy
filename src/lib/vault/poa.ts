@@ -1,4 +1,4 @@
-import { TOPIC_LABEL } from "@/lib/legal/il";
+import { TOPIC_LABEL } from "@/lib/legal";
 import type { Capability, PoaGrant } from "@/types/vault";
 
 export const CAPABILITIES: { id: Capability; label: string; hint: string }[] = [

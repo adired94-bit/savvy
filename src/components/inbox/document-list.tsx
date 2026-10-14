@@ -3,7 +3,7 @@
 import { LoaderCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { CATEGORIES } from "@/config/categories";
-import { formatCurrency, formatRelative } from "@/lib/format";
+import { formatMoney, formatRelative } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { InboxDocument } from "@/types/inbox";
 import { SOURCE_META } from "./source";
@@ -47,7 +47,7 @@ export function DocumentList({
                   {src.label} · {formatRelative(d.receivedAt)}
                 </p>
               </div>
-              {!processing && <p className="num text-lg font-bold">{formatCurrency(d.total)}</p>}
+              {!processing && <p className="num text-lg font-bold">{formatMoney(d.total, d.currency)}</p>}
             </button>
           </li>
         );

@@ -1,4 +1,5 @@
-import { groundsById } from "@/lib/legal/il";
+import { formatMoney } from "@/lib/format";
+import { groundsById, letterLanguageFor } from "@/lib/legal";
 import type { ClaimCase, DraftedLetter } from "@/types/claims";
 
 const dateFmt = new Intl.DateTimeFormat("he-IL", { day: "numeric", month: "long", year: "numeric" });
@@ -12,16 +13,51 @@ const REQUEST_BY_TOPIC: Record<ClaimCase["topic"], string> = {
   subscription: "לבטל את החיוב, לזכות אותי בסכומים שנגבו, ולהפסיק את החיוב העתידי.",
 };
 
+const enDateFmt = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
+const EN_REQUEST_BY_TOPIC: Record<ClaimCase["topic"], string> = {
+  telecom: "cancel the charge, refund the amount paid in error, and restore the price I agreed to.",
+  insurance: "review my premium, explain the change in writing, and provide an updated quote.",
+  banking: "refund the fees charged in error and stop charging them.",
+  flight: "pay the compensation I am entitled to for the flight above.",
+  product: "refund the price I paid or, alternatively, repair or replace the product.",
+  subscription: "cancel the subscription, refund the amounts charged, and stop all future charges.",
+};
+
 /**
- * Drafts the dispute letter for a claim.
- *
- * Module 3 uses a deterministic template. The production version keeps this exact signature but
- * calls the Claude API with the case facts and ONLY the grounds from `@/lib/legal/il`, so the model
- * can phrase the letter but never invents a statute. Letters are always shown to the user first.
+ * Offline fallback letter for a claim, used when the AI route is not configured or fails.
+ * The AI version (`/api/letters`) writes the letter with the Claude API and may cite ONLY the
+ * grounds from `@/lib/legal` for the case's jurisdiction. Letters are always shown to the user first.
  */
 export function draftLetter(c: ClaimCase, now: Date = new Date()): DraftedLetter {
   const grounds = c.groundIds.map((id) => groundsById[id]).filter(Boolean);
-  const amount = new Intl.NumberFormat("he-IL", { style: "currency", currency: "ILS", maximumFractionDigits: 0 }).format(c.facts.amount);
+  const language = letterLanguageFor(c.jurisdiction ?? "IL");
+  const amount = formatMoney(c.facts.amount, c.currency, { precise: language === "en" });
+  const meta = { language, citedGroundIds: grounds.map((g) => g.id), isTemplate: true };
+
+  if (language === "en") {
+    const body = [
+      `Date: ${enDateFmt.format(now)}`,
+      `To: ${c.provider}, Customer Relations`,
+      "",
+      `Re: ${c.title}${c.facts.accountRef ? ` (reference: ${c.facts.accountRef})` : ""}`,
+      "",
+      "Dear Sir or Madam,",
+      "",
+      `${c.facts.summary}${c.facts.period ? ` (${c.facts.period})` : ""} The amount involved is ${amount}.`,
+      "",
+      "I believe this conduct does not comply with the law:",
+      ...grounds.map((g) => `- ${g.letterClause}`),
+      "",
+      `I therefore ask you to ${EN_REQUEST_BY_TOPIC[c.topic]}`,
+      "Please reply in writing within 14 days. If I do not receive a satisfactory answer, I may refer the matter to the competent authorities or to small-claims court.",
+      "",
+      "Sincerely,",
+      c.facts.customerName,
+      "This letter is sent on my behalf by Savvy under a limited power of attorney that I granted.",
+    ].join("\n");
+    return { subject: c.title, body, ...meta };
+  }
 
   const body = [
     `תאריך: ${dateFmt.format(now)}`,
@@ -44,5 +80,5 @@ export function draftLetter(c: ClaimCase, now: Date = new Date()): DraftedLetter
     "הפנייה נשלחה בשמי על ידי Savvy, מכוח ייפוי כוח מוגבל שנתתי.",
   ].join("\n");
 
-  return { subject: c.title, body };
+  return { subject: c.title, body, ...meta };
 }

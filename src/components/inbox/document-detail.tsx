@@ -4,13 +4,12 @@ import { ArrowRight, CircleAlert, Repeat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
 import { ACTIVE_MARKET } from "@/config/market";
-import { formatCurrency } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { InboxDocument } from "@/types/inbox";
 import { SOURCE_META } from "./source";
 
 const dateFmt = new Intl.DateTimeFormat(ACTIVE_MARKET.locale, { day: "numeric", month: "short" });
-const preciseFmt = new Intl.NumberFormat(ACTIVE_MARKET.locale, { style: "currency", currency: ACTIVE_MARKET.currency });
 
 export function DocumentDetail({ doc, onBack }: { doc: InboxDocument; onBack: () => void }) {
   const flagged = doc.lineItems.filter((l) => l.flag);
@@ -33,9 +32,15 @@ export function DocumentDetail({ doc, onBack }: { doc: InboxDocument; onBack: ()
           </div>
           <div className="text-end">
             <p className="text-sm text-ink-muted">סה״כ לתשלום</p>
-            <p className="num text-3xl font-bold">{preciseFmt.format(doc.total)}</p>
+            <p className="num text-3xl font-bold">{formatMoney(doc.total, doc.currency, { precise: true })}</p>
           </div>
         </div>
+
+        {doc.isDemo && (
+          <p className="mt-4 rounded-xl border border-line bg-white/[0.03] px-3 py-2 text-xs text-ink-muted">
+            מצב הדגמה: זו דוגמה, לא הקובץ שהעלית. כדי לקרוא מסמכים אמיתיים צריך לחבר מפתח Claude בשרת.
+          </p>
+        )}
 
         {doc.previewUrl && (
           // eslint-disable-next-line @next/next/no-img-element
@@ -48,7 +53,7 @@ export function DocumentDetail({ doc, onBack }: { doc: InboxDocument; onBack: ()
           <div className="min-w-0 flex-1">
             <p className="text-sm text-ink-muted">{doc.finding}</p>
             <p className="mt-0.5 font-semibold">
-              אפשר להחזיר לך <span className="num text-xl text-money-bright">{formatCurrency(doc.potentialSaving)}</span>
+              אפשר להחזיר לך <span className="num text-xl text-money-bright">{formatMoney(doc.potentialSaving, doc.currency)}</span>
             </p>
           </div>
           <Button>נטפל בזה</Button>
@@ -74,7 +79,7 @@ export function DocumentDetail({ doc, onBack }: { doc: InboxDocument; onBack: ()
                     )}
                   </p>
                 </div>
-                <p className="num font-bold">{preciseFmt.format(l.amount)}</p>
+                <p className="num font-bold">{formatMoney(l.amount, doc.currency, { precise: true })}</p>
               </div>
               {l.flag && (
                 <p className="mt-2 flex items-center gap-1.5 text-sm text-alert">
