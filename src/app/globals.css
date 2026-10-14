@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+/*
+ * SAVVY design system (Tailwind v4: the @theme block below IS the Tailwind config).
+ * Every token becomes a utility, e.g. --color-money -> bg-money / text-money.
+ * RTL: the app is rendered with dir="rtl". Use logical utilities only
+ * (ms-/me-/ps-/pe-/start-/end-/text-start) so layouts mirror automatically for LTR markets.
+ */
+@theme {
+  /* Surfaces */
+  --color-obsidian: #0b0f17;        /* app background */
+  --color-midnight: #0f1521;        /* sidebar / sunken areas */
+  --color-card: #1e293b;            /* elevated cards */
+  --color-card-hover: #243247;
+  --color-line: rgb(255 255 255 / 0.07);
+  --color-line-strong: rgb(255 255 255 / 0.12);
+
+  /* Typography */
+  --color-ink: #f8fafc;             /* crisp white */
+  --color-ink-muted: #a3b1c4;
+  --color-ink-faint: #7c8aa0;        /* AA contrast on obsidian */
+
+  /* Brand & status */
+  --color-money: #10b981;           /* electric emerald: savings / money */
+  --color-money-bright: #34d399;
+  --color-money-deep: #047857;
+  --color-alert: #f59e0b;
+  --color-danger: #f43f5e;
+  --color-info: #38bdf8;
+
+  /* Savings categories (shared by charts, legends and badges) */
+  --color-cat-subscriptions: #10b981;
+  --color-cat-telecom: #38bdf8;
+  --color-cat-banking: #a78bfa;
+  --color-cat-warranties: #f59e0b;
+  --color-cat-refunds: #f472b6;
+
+  /* Type scale */
+  --font-sans: var(--font-heebo), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter), var(--font-heebo), ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: 3.5rem;
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 700;
+
+  /* Radii & shadows */
+  --radius-card: 1.25rem;
+  --shadow-glow: 0 0 0 1px rgb(16 185 129 / 0.22);
+  --shadow-card: 0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 20px 40px -24px rgb(0 0 0 / 0.8);
+
+  /* Motion */
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-pulse-soft: pulse-soft 2.4s var(--ease-premium) infinite;
+
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.55; transform: scale(0.85); }
+  }
+}
+
+/* Glass card surface: translucent slate, no gradients */
+@utility glass {
+  background: rgb(30 41 59 / 0.55);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+/* Money figures: Inter digits (sharper than Hebrew-font digits), tabular, LTR-isolated inside RTL text */
+@utility num {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum", "cv11";
+  unicode-bidi: isolate;
+  direction: ltr;
+  display: inline-block;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+  body {
+    background-color: var(--color-obsidian);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    background: rgb(16 185 129 / 0.35);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-money);
+    outline-offset: 2px;
+  }
+}
