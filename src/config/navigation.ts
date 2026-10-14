@@ -1,4 +1,4 @@
-import { Inbox, LayoutDashboard, Lock, Scale, type LucideIcon } from "lucide-react";
+import { Inbox, LayoutDashboard, Lock, Scale, Settings, type LucideIcon } from "lucide-react";
 
 export interface NavItem {
   href: string;
@@ -12,5 +12,6 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "לוח בקרה", icon: LayoutDashboard },
   { href: "/inbox", label: "חשבוניות", icon: Inbox },
   { href: "/claims", label: "תביעות", icon: Scale },
-  { href: "/vault", label: "כספת", icon: Lock, soon: true },
+  { href: "/vault", label: "כספת", icon: Lock },
+  { href: "/settings", label: "הגדרות", icon: Settings },
 ];

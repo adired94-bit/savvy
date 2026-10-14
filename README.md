@@ -2,7 +2,7 @@
 
 Premium FinTech web app (Hebrew RTL first) that finds overcharges in a household's bills and negotiates or files claims to get the money back.
 
-**Status:** Modules 1 (design system + dashboard), 2 (smart inbox) and 3 (claims engine), all on mock data.
+**Status:** Modules 1 (design system + dashboard), 2 (smart inbox), 3 (claims engine) and 4 (vault, power of attorney, settings), all on mock data.
 
 ## Run
 
@@ -40,7 +40,8 @@ savvy/
 │  │  ├─ page.tsx                  # Dashboard (Module 1)
 │  │  ├─ inbox/                    # Module 2 · Smart Inbox and OCR (built, mock extraction)
 │  │  ├─ claims/                   # Module 3 · Negotiation and Claims (built, mock)
-│  │  ├─ vault/                    # Module 4 · Security vault & PoA        (planned)
+│  │  ├─ vault/                    # Module 4 · Vault and power of attorney (built, mock)
+│  │  ├─ settings/                 # Profile, connections, notifications (built, mock)
 │  │  └─ api/                      # Route handlers: AI, webhooks, Gmail/Outlook OAuth (planned)
 │  ├─ components/
 │  │  ├─ ui/                       # Primitives: GlassCard, Button, Badge, ProgressBar, AnimatedCounter
@@ -81,3 +82,12 @@ Extraction is mocked in `src/lib/api/inbox.ts` (`extractDocument`). The real ver
 - Letters are always previewable before approval, and nothing is sent without the user's tap.
 
 **Legal review required:** the grounds and letter text are a product draft, not legal advice. Section numbers are filled in only where well established. An Israeli consumer-law attorney must review the library and templates before any real letter is sent.
+
+## Module 4 notes (vault, power of attorney, settings)
+
+- `/vault`: sign a limited digital power of attorney in three steps (what you allow, SMS verification, drawn signature), manage what the agent may do, revoke with one tap, see the audit log.
+- Hard limits are fixed and not toggleable (`NEVER_DO` in `src/lib/vault/poa.ts`): no moving money, no bank passwords, no new contracts, no waiving rights, no court filings.
+- `/settings`: profile, connected accounts (read-only), notification preferences, data export and deletion.
+- State lives in `src/store/vault-store.ts` (Zustand, in memory for now).
+- **Not real yet:** the encryption panel is a UI explainer; SMS verification accepts any 6-digit code; the signature stays in memory. Real client-side encryption, identity verification and signature storage arrive with Supabase.
+- **Legal review required:** the power of attorney wording, the validity of a drawn digital signature and the identity checks must be reviewed by an Israeli attorney before launch.
