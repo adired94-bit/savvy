@@ -1,0 +1,95 @@
+import type { DashboardData } from "@/types/finance";
+
+/** Placeholder data for Module 1. Replaced by Supabase queries in later modules. */
+const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
+
+export const mockDashboard: DashboardData = {
+  user: { firstName: "אדיר" },
+  savings: {
+    month: 612,
+    lifetime: 8742,
+    monthDelta: 0.24,
+    annualizedRecurring: 3960,
+  },
+  categories: [
+    { id: "subscriptions", amount: 2310, cases: 9 },
+    { id: "telecom", amount: 2875, cases: 4 },
+    { id: "banking", amount: 1190, cases: 6 },
+    { id: "warranties", amount: 860, cases: 2 },
+    { id: "refunds", amount: 1507, cases: 3 },
+  ],
+  trend: [
+    { month: "2026-05", amount: 310 },
+    { month: "2026-06", amount: 455 },
+    { month: "2026-07", amount: 390 },
+    { month: "2026-08", amount: 720 },
+    { month: "2026-09", amount: 494 },
+    { month: "2026-10", amount: 612 },
+  ],
+  negotiations: [
+    {
+      id: "neg_1",
+      provider: "פרטנר",
+      category: "telecom",
+      title: "חבילת סלולר: סיום הטבה והעלאת מחיר",
+      stage: "negotiating",
+      expectedSaving: 45,
+      recurrence: "monthly",
+      lastUpdate: "הנציג הציע ₪30 הנחה, ביקשנו התאמה למחיר השוק",
+      updatedAt: hoursAgo(2),
+    },
+    {
+      id: "neg_2",
+      provider: "בנק לאומי",
+      category: "banking",
+      title: "דמי ניהול חשבון למרות זכאות למסלול בסיסי",
+      stage: "letter_sent",
+      expectedSaving: 384,
+      recurrence: "one_time",
+      lastUpdate: "נשלח מכתב דרישה להחזר 12 חודשי עמלות",
+      updatedAt: hoursAgo(20),
+    },
+    {
+      id: "neg_3",
+      provider: "אל על",
+      category: "refunds",
+      title: "פיצוי על עיכוב טיסה LY315 (חוק שירותי תעופה)",
+      stage: "negotiating",
+      expectedSaving: 1510,
+      recurrence: "one_time",
+      lastUpdate: "החברה אישרה קבלת התביעה, ממתינים לתשובה",
+      updatedAt: hoursAgo(31),
+    },
+    {
+      id: "neg_4",
+      provider: "yes",
+      category: "subscriptions",
+      title: "ביטול חבילת ספורט שלא הוזמנה",
+      stage: "resolved",
+      expectedSaving: 69,
+      recurrence: "monthly",
+      lastUpdate: "החיוב בוטל והוחזרו ₪207 לכרטיס",
+      updatedAt: hoursAgo(54),
+    },
+  ],
+  anomalies: [
+    {
+      id: "anm_1",
+      provider: "הראל ביטוח",
+      category: "warranties",
+      title: "ביטוח רכב התייקר ב-18% בחידוש",
+      description: "הפרמיה עלתה מ-₪3,420 ל-₪4,036 בלי שינוי בפרופיל הנהג. הצעות מקבילות בשוק נמוכות ב-₪540 בממוצע.",
+      amount: 540,
+      legalBasis: "חובת גילוי לפי חוק הגנת הצרכן, סעיף 2",
+      confidence: 0.91,
+      detectedAt: hoursAgo(1),
+    },
+  ],
+  activity: [
+    { id: "act_1", kind: "refund", title: "החזר חיוב כפול", provider: "Spotify", amount: 23, at: hoursAgo(3) },
+    { id: "act_2", kind: "detected", title: "זוהתה העלאת מחיר", provider: "הראל ביטוח", at: hoursAgo(1) },
+    { id: "act_3", kind: "letter", title: "נשלח מכתב דרישה", provider: "בנק לאומי", at: hoursAgo(20) },
+    { id: "act_4", kind: "price_drop", title: "הפחתת מחיר חודשי", provider: "yes", amount: 69, at: hoursAgo(54) },
+    { id: "act_5", kind: "refund", title: "זיכוי עמלת המרת מט״ח", provider: "ישראכרט", amount: 41, at: hoursAgo(75) },
+  ],
+};
