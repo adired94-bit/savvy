@@ -9,7 +9,7 @@ export function MobileNav() {
   const pathname = usePathname();
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-midnight/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden">
-      <ul className="grid grid-cols-4">
+      <ul className="grid grid-cols-5">
         {NAV_ITEMS.map(({ href, label, icon: Icon, soon }) => {
           const active = pathname === href;
           return (
